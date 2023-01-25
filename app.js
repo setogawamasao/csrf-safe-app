@@ -14,6 +14,7 @@ app.use(
     saveUninitialized: false,
   })
 );
+
 // requestのbodyから値を取得する設定
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -34,7 +35,7 @@ app.get("/change", (req, res) => {
 app.post("/submit", (req, res) => {
   var data = {};
   data.userId = req.session.userId;
-  data.password = req.body.pwd;
+  data.password = req.body.password;
   res.render("./result.ejs", data);
 });
 
