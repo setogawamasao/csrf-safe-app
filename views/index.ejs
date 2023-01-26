@@ -8,5 +8,6 @@
     <p>ログインしました</p>
     <div>ユーザーID:<%- userId %></div>
     <a href="/change">パスワード変更</a>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
   </body>
 </html>

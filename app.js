@@ -1,5 +1,7 @@
 const express = require("express");
 const session = require("express-session");
+const csrf = require("csurf");
+
 const app = express();
 const port = 3001;
 
@@ -19,23 +21,30 @@ app.use(
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/", (req, res) => {
+// CSRF対策
+const csrfProtection = csrf({ cookie: false });
+
+app.get("/", csrfProtection, (req, res) => {
   const userId = "yamada";
   // セッションにユーザーIDを格納
   req.session.userId = userId;
   var data = {};
   data.userId = userId;
+  data.csrfToken = req.csrfToken();
   res.render("./index.ejs", data);
 });
 
-app.get("/change", (req, res) => {
-  res.render("./change.ejs");
+app.get("/change", csrfProtection, (req, res) => {
+  var data = {};
+  data.csrfToken = req.csrfToken();
+  res.render("./change.ejs", data);
 });
 
-app.post("/submit", (req, res) => {
+app.post("/submit", csrfProtection, (req, res) => {
   var data = {};
   data.userId = req.session.userId;
   data.password = req.body.password;
+  data.csrfToken = req.csrfToken();
   res.render("./result.ejs", data);
 });
 

@@ -8,6 +8,7 @@
     <p>パスワード変更画面</p>
     <form action="/submit" method="POST">
       新パスワード:<input name="password" type="password" />
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <br />
       <input type="submit" value="パスワード変更" />
     </form>
