@@ -9,6 +9,7 @@
     <p>ログインユーザー：<%- userId %>さん</p>
     <form action="/change" method="POST">
       新しいパスワード:<input name="password" type="password" />
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <br />
       <input type="submit" value="パスワード変更" />
     </form>

@@ -35,12 +35,12 @@ app.post("/authorize", (req, res) => {
   const secret = tokens.secretSync();
   const token = tokens.create(secret);
   req.session._csrf = secret;
-  res.cookie("_csrf", token);
 
   const userId = req.body.userId;
   req.session.userId = userId;
   const data = {};
   data.userId = userId;
+  data.csrfToken = token;
   res.render("./change.ejs", data);
 });
 
@@ -53,7 +53,7 @@ app.post("/change", (req, res) => {
 
   // csrf対策
   const secret = req.session._csrf;
-  const token = req.cookies._csrf;
+  const token = req.body._csrf;
   if (tokens.verify(secret, token) === false) {
     throw new Error("CSRF攻撃を受けています");
   }
