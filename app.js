@@ -3,10 +3,10 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const Tokens = require("csrf");
-const tokens = new Tokens();
 
 const app = express();
 const port = 3001;
+const tokens = new Tokens();
 
 // htmlテンプレートエンジンを設定
 app.set("view engine", "ejs");
@@ -31,14 +31,10 @@ app.post("/authorize", (req, res) => {
     throw new Error("ログイン情報が不正です");
   }
 
-  // 新規に 秘密文字 と トークン を生成
+  // csrf対策
   const secret = tokens.secretSync();
   const token = tokens.create(secret);
-
-  // 秘密文字はセッションに保存
   req.session._csrf = secret;
-
-  // トークンはクッキーに保存
   res.cookie("_csrf", token);
 
   const userId = req.body.userId;
@@ -55,7 +51,7 @@ app.post("/change", (req, res) => {
   }
   console.log("session id : ", req.session.id);
 
-  // csrfチェック
+  // csrf対策
   const secret = req.session._csrf;
   const token = req.cookies._csrf;
   if (tokens.verify(secret, token) === false) {
