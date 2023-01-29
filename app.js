@@ -1,6 +1,9 @@
 const express = require("express");
 const session = require("express-session");
-const csrf = require("csurf");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const Tokens = require("csrf");
+const tokens = new Tokens();
 
 const app = express();
 const port = 3001;
@@ -8,46 +11,66 @@ const port = 3001;
 // htmlテンプレートエンジンを設定
 app.set("view engine", "ejs");
 
-// sessionの設定
-app.use(
-  session({
-    secret: "secret_key",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
 // requestのbodyから値を取得する設定
-var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// CSRF対策
-const csrfProtection = csrf({ cookie: false });
+// requestのcookieから値を取得する設定
+app.use(cookieParser());
 
-app.get("/", csrfProtection, (req, res) => {
-  const userId = "yamada";
-  // セッションにユーザーIDを格納
-  req.session.userId = userId;
-  var data = {};
-  data.userId = userId;
-  data.csrfToken = req.csrfToken();
-  res.render("./index.ejs", data);
+// session設定
+app.use(session({ secret: "secret_key" }));
+
+app.get("/login", (req, res) => {
+  req.session.destroy((err) => {
+    res.render("./login.ejs");
+  });
 });
 
-app.get("/change", csrfProtection, (req, res) => {
-  var data = {};
-  data.csrfToken = req.csrfToken();
+app.post("/authorize", (req, res) => {
+  if (req.body.userId !== "suzuki" || req.body.password !== "123") {
+    throw new Error("ログイン情報が不正です");
+  }
+
+  // 新規に 秘密文字 と トークン を生成
+  const secret = tokens.secretSync();
+  const token = tokens.create(secret);
+
+  // 秘密文字はセッションに保存
+  req.session._csrf = secret;
+
+  // トークンはクッキーに保存
+  res.cookie("_csrf", token);
+
+  const userId = req.body.userId;
+  req.session.userId = userId;
+  const data = {};
+  data.userId = userId;
   res.render("./change.ejs", data);
 });
 
-app.post("/submit", csrfProtection, (req, res) => {
-  var data = {};
+app.post("/change", (req, res) => {
+  // ログイン状態の確認
+  if (!req.session.id) {
+    throw new Error("ログインしてください");
+  }
+  console.log("session id : ", req.session.id);
+
+  // csrfチェック
+  const secret = req.session._csrf;
+  const token = req.cookies._csrf;
+  if (tokens.verify(secret, token) === false) {
+    throw new Error("CSRF攻撃を受けています");
+  }
+
+  // ★本来ここでパスワードの変更処理を実施する★
+
+  const data = {};
   data.userId = req.session.userId;
   data.password = req.body.password;
-  data.csrfToken = req.csrfToken();
+
   res.render("./result.ejs", data);
 });
 
 app.listen(port, () => {
-  console.log(`danger app listening at http://localhost:${port}`);
+  console.log(`safe app listening at http://sample.com:${port}/login`);
 });
