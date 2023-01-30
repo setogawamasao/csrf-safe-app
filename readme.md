@@ -22,11 +22,12 @@
   hosts ファイルに下記を追記して、localhost に別名を付ける  
   127.0.0.1 sample.com trap.com
 
-- npm install
+- Node.js をインストールして、下記コマンドを実行
+  npm install
 
 ## 起動
 
-- Node.js をインストールして、下記コマンドを実行  
+- 下記コマンドを実行  
   npm run start
 
 ## 接続
