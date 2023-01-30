@@ -1,7 +1,6 @@
 const express = require("express");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
 const Tokens = require("csrf");
 
 const app = express();
@@ -13,9 +12,6 @@ app.set("view engine", "ejs");
 
 // requestのbodyから値を取得する設定
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// requestのcookieから値を取得する設定
-app.use(cookieParser());
 
 // session設定
 app.use(session({ secret: "secret_key" }));
