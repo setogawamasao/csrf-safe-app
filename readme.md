@@ -5,7 +5,7 @@
 
 1. 脆弱性のあるアプリ(https://github.com/setogawamasao/csrf-dangerous-app)
 2. 脆弱性を利用した罠アプリ(https://github.com/setogawamasao/csrf-trap-app)
-3. 脆弱性を対策したアプリ(https://github.com/setogawamasao/csrf-dangerous-app)
+3. 脆弱性を対策したアプリ(https://github.com/setogawamasao/csrf-safe-app)
 
 このアプリは「3. 脆弱性を対策したアプリ」です。
 
